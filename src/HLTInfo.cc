@@ -254,7 +254,7 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 
 	  if ( index == hltresults->size() )   
 	  {
-//		  cout << " trigger missing   " << endl;
+//		  cout << " trigger not in trigger list   " << endl;
 		  continue;
 	  }
 	  
@@ -267,7 +267,7 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
       if (accept){trigflag[itrig] = 1;}
       else {trigflag[itrig] = 0;}
 
-	  cout << "trigger flag: " << trigflag[itrig] << "    prescaler:  " << trigPrescl[itrig] << endl;
+//	  cout << "trigger flag: " << trigflag[itrig] << "    prescaler:  " << trigPrescl[itrig] << endl;
 
       if (accept)         //add trigger objects
 	  {
@@ -289,25 +289,25 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
     
     	  if( lastfilter != -999)
     		  {
-    			  std::cout<<trigName<<" prescale = "<<trigPrescl[itrig]<<endl;
+//    			  std::cout<<trigName<<" prescale = "<<trigPrescl[itrig]<<endl;
     			  const string& lastfiltermoduleLabel(moduleLabels[lastfilter]);
     			  const string  lastfiltermoduleType(hltConfig_.moduleType(lastfiltermoduleLabel));
     			  const unsigned int lastfilterfilterIndex(triggerEventHandle_->filterIndex(edm::InputTag(lastfiltermoduleLabel,"",processName_)));
-    			  cout<<"last filterIndex: "<<lastfilterfilterIndex<<" triggerEventHandle_->sizeFilters(): "<<triggerEventHandle_->sizeFilters()<<endl;
-    			  cout << " 'L3' filter in slot " << lastfilter << " - label/type " << lastfiltermoduleLabel << "/" << lastfiltermoduleType << endl;
+//    			  cout<<"last filterIndex: "<<lastfilterfilterIndex<<" triggerEventHandle_->sizeFilters(): "<<triggerEventHandle_->sizeFilters()<<endl;
+//    			  cout << " 'L3' filter in slot " << lastfilter << " - label/type " << lastfiltermoduleLabel << "/" << lastfiltermoduleType << endl;
                   const trigger::Vids& VIDS (triggerEventHandle_->filterIds(lastfilterfilterIndex));
                   const trigger::Keys& KEYS(triggerEventHandle_->filterKeys(lastfilterfilterIndex));
                   const trigger::size_type nI(VIDS.size());
                   const trigger::size_type nK(KEYS.size());
     
                   const trigger::size_type n(max(nI,nK));
-    			  cout << "   " << n  << " accepted 'L3' objects found: " << endl;
+//    			  cout << "   " << n  << " accepted 'L3' objects found: " << endl;
     
                   const trigger::TriggerObjectCollection& TOC(triggerEventHandle_->getObjects());
     
                   for (trigger::size_type i=0; i!=n; ++i) {
                       const trigger::TriggerObject& TO(TOC[KEYS[i]]);
-                      cout <<trigName<<" "<<lastfiltermoduleLabel<<" "<<lastfiltermoduleType<< "   " << i << " " << VIDS[i] << "/" << KEYS[i] << ": " << TO.id() << " " << TO.pt() << " " << TO.eta() << " " << TO.phi() << " " << TO.mass() << endl;
+//                      cout <<trigName<<" "<<lastfiltermoduleLabel<<" "<<lastfiltermoduleType<< "   " << i << " " << VIDS[i] << "/" << KEYS[i] << ": " << TO.id() << " " << TO.pt() << " " << TO.eta() << " " << TO.phi() << " " << TO.mass() << endl;
     
                       trigObject[itrig].push_back(TO);
                   }
