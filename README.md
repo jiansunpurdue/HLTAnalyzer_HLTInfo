@@ -20,7 +20,8 @@ The soluion is to fill the trigger decision by the trigger name not the index.
 
 Here I try to fix the mismatch with adding branch by the triger list we provided not the trigger 
 list in the event. Then in each event, I looped over all triggers in our trigger list and find the 
-index, find the trigger decision, prescaler and trigger objects.
+index, find the trigger decision, prescaler and trigger objects. The trigger list I used is in file
+hltanalysis_cff.py  You can just add the triggers you are interested
 
 fix the mismatch if the evet trigger lists in one file are not the same
 
