@@ -7,7 +7,7 @@ by the trigger list of the 1st event. Then we assume the trigger list of other e
 are the same with 1st and fill the trigger decision. However, it is not always this
 case. Then there will be mismatch.
 
-For detailed information of mismatch, you can have a look at out_hlt_5316_first, which
+For detailed information of mismatch, you can have a look at "out_hlt_5316_first", which
 I got with the official code. In the file, you can see, from 129 event, 
 Filling decision itrig  :  4      trigName:     HLT_HIL1CaloMonitor_v1
 this trigger is added to the trigger list. But we are still filling the trigger decision
