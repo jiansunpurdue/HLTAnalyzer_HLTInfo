@@ -26,8 +26,8 @@ hltanalysis_cff.py  You can just add the triggers you are interested
 In src and interface directory, there are two versions of HLTInfo.h and HLTInfo.cc with the fix for
 with trigger objects and without trigger objects.
 
-HLTInfo.cc_listbranch_noobj and HLTInfo.cc_listbranch_obj (same for HLTInfo.h) are the two files with the fix. Other files
-are just backups.
+HLTInfo.cc_listbranch_noobj and HLTInfo.cc_listbranch_obj (same for HLTInfo.h) are the two versions
+with the fix. Other files are just backups.
 
 The code are developed in CMSSW_5_3_16 with the official HLTrigger/HLTAnalyzer package
 
