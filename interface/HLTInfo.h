@@ -59,8 +59,13 @@
 #include "L1Trigger/GlobalTriggerAnalyzer/interface/L1GtUtils.h"
 
 #include "FWCore/Common/interface/TriggerNames.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
+#include "DataFormats/Common/interface/TriggerResults.h"
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
+
 
 typedef std::vector<std::string> MyStrings;
+typedef std::vector<trigger::TriggerObject> trigO;
 
 /** \class HLTInfo
   *  
@@ -116,6 +121,7 @@ private:
   int l1hfRing1EtSumPositiveEta,l1hfRing2EtSumPositiveEta;
   int l1hfTowerCountPositiveEtaRing1,l1hfTowerCountNegativeEtaRing1;
   int l1hfTowerCountPositiveEtaRing2,l1hfTowerCountNegativeEtaRing2;
+  trigO *trigObject;
 
   unsigned int ntrigs;  // added by jian
   edm::TriggerNames triggerNames;  //added by jian
@@ -125,6 +131,8 @@ private:
   std::vector<std::string> dummyBranches_;
 
   HLTConfigProvider hltConfig_; 
+  edm::InputTag triggerEventTag_;
+  edm::Handle<trigger::TriggerEvent> triggerEventHandle_;
   L1GtUtils m_l1GtUtils;
   std::string processName_;
 

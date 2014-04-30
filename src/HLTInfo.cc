@@ -20,7 +20,7 @@
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutSetup.h"
 #include "DataFormats/L1GlobalTrigger/interface/L1GlobalTriggerReadoutRecord.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
-
+#include "HLTrigger/HLTcore/interface/HLTConfigProvider.h"
 
 static const bool useL1EventSetup(true);
 static const bool useL1GtTriggerMenuLite(false);
@@ -73,6 +73,7 @@ void HLTInfo::setup(const edm::ParameterSet& pSet, TTree* HltTree) {
   const int kMaxTrigFlag = 10000;
   trigflag = new int[kMaxTrigFlag];
   trigPrescl = new int[kMaxTrigFlag];
+  trigObject = new trigO[kMaxTrigFlag];
   L1EvtCnt = 0;
   const int kMaxL1Flag = 10000;
   l1flag = new int[kMaxL1Flag];
@@ -213,10 +214,11 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 
   /////////// Analyzing HLT Trigger Results (TriggerResults) //////////
   if (hltresults.isValid()) {
-//    int ntrigs = hltresults->size();
-//    if (ntrigs==0){std::cout << "%HLTInfo -- No trigger name given in TriggerResults of the input " << std::endl;}
+//    int evttriggersize = hltresults->size();
+//    if (evttriggersize==0){std::cout << "%HLTInfo -- No trigger name given in TriggerResults of the input " << std::endl;}
 
-//    edm::TriggerNames const& triggerNames = iEvent.triggerNames(*hltresults);
+     triggerEventTag_ = (edm::InputTag)("hltTriggerSummaryAOD");
+	 iEvent.getByLabel(triggerEventTag_,triggerEventHandle_);
 
     // 1st event : Book as many branches as trigger paths provided in the input...
     if (HltEvtCnt==0){
@@ -232,6 +234,7 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 		cout << " first event itrig    :    " << itrig << "           trigName :   " << trigName << endl;
         HltTree->Branch(trigName,trigflag+itrig,trigName+"/I");
         HltTree->Branch(trigName+"_Prescl",trigPrescl+itrig,trigName+"_Prescl/I");
+		HltTree->Branch(trigName+"_trigObject",trigObject+itrig);
 		trigflag[itrig] = 0;
 		trigPrescl[itrig] = 0;
       }
@@ -239,6 +242,8 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
       HltEvtCnt++;
     }
      
+    //reset trigger pt's to 0 after every cycle through the triggers
+    for (unsigned int ijij = 0; ijij<ntrigs; ijij++){ trigObject[ijij].clear();}
 
     for (unsigned int itrig = 0; itrig != ntrigs; ++itrig){
 
@@ -259,10 +264,57 @@ void HLTInfo::analyze(const edm::Handle<edm::TriggerResults>                 & h
 
       trigPrescl[itrig] = hltConfig_.prescaleValue(iEvent, eventSetup, trigName);
 
-
       if (accept){trigflag[itrig] = 1;}
       else {trigflag[itrig] = 0;}
 
+	  cout << "trigger flag: " << trigflag[itrig] << "    prescaler:  " << trigPrescl[itrig] << endl;
+
+      if (accept)         //add trigger objects
+	  {
+          //MODIFIED 02/17/2014 TO INCLUDE TRIGGER DECISION PT FOR JET TRIGS
+          const unsigned int triggerIndex(hltConfig_.triggerIndex(trigName));
+          const vector<string>& moduleLabels(hltConfig_.moduleLabels(triggerIndex));
+    	  int lastfilter = -999;
+          for(unsigned int im=0; im<hltConfig_.moduleLabels(trigName).size(); im++){
+              const string& moduleLabel(moduleLabels[im]);
+              const string  moduleType(hltConfig_.moduleType(moduleLabel));
+    
+              if(moduleType == "HLTLevel1GTSeed") continue;   //L1 seed
+    
+              // check whether the module is packed up in TriggerEvent product
+              const unsigned int filterIndex(triggerEventHandle_->filterIndex(edm::InputTag(moduleLabel,"",processName_)));
+              if (filterIndex<triggerEventHandle_->sizeFilters())  
+    			  lastfilter = im;
+    	  }
+    
+    	  if( lastfilter != -999)
+    		  {
+    			  std::cout<<trigName<<" prescale = "<<trigPrescl[itrig]<<endl;
+    			  const string& lastfiltermoduleLabel(moduleLabels[lastfilter]);
+    			  const string  lastfiltermoduleType(hltConfig_.moduleType(lastfiltermoduleLabel));
+    			  const unsigned int lastfilterfilterIndex(triggerEventHandle_->filterIndex(edm::InputTag(lastfiltermoduleLabel,"",processName_)));
+    			  cout<<"last filterIndex: "<<lastfilterfilterIndex<<" triggerEventHandle_->sizeFilters(): "<<triggerEventHandle_->sizeFilters()<<endl;
+    			  cout << " 'L3' filter in slot " << lastfilter << " - label/type " << lastfiltermoduleLabel << "/" << lastfiltermoduleType << endl;
+                  const trigger::Vids& VIDS (triggerEventHandle_->filterIds(lastfilterfilterIndex));
+                  const trigger::Keys& KEYS(triggerEventHandle_->filterKeys(lastfilterfilterIndex));
+                  const trigger::size_type nI(VIDS.size());
+                  const trigger::size_type nK(KEYS.size());
+    
+                  const trigger::size_type n(max(nI,nK));
+    			  cout << "   " << n  << " accepted 'L3' objects found: " << endl;
+    
+                  const trigger::TriggerObjectCollection& TOC(triggerEventHandle_->getObjects());
+    
+                  for (trigger::size_type i=0; i!=n; ++i) {
+                      const trigger::TriggerObject& TO(TOC[KEYS[i]]);
+                      cout <<trigName<<" "<<lastfiltermoduleLabel<<" "<<lastfiltermoduleType<< "   " << i << " " << VIDS[i] << "/" << KEYS[i] << ": " << TO.id() << " " << TO.pt() << " " << TO.eta() << " " << TO.phi() << " " << TO.mass() << endl;
+    
+                      trigObject[itrig].push_back(TO);
+                  }
+              }
+	  }
+//      }
+      //END MODIFICATIONS
       if (_Debug){
         if (_Debug) std::cout << "%HLTInfo --  Number of HLT Triggers: " << ntrigs << std::endl;
         std::cout << "%HLTInfo --  HLTTrigger(" << itrig << "): " << trigName << " = " << accept << std::endl;
