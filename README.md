@@ -1,11 +1,11 @@
 HLTAnalyzer_HLTInfo
 ===================
 
-In the official package, there will be mismatch if event trigger lists are not
+In the official package, there will be mismatch if the event trigger lists are not
 the same in one datafile. In the officical version of HLTInfo.cc, we add the branch
-by the trigger list of the 1st event. Then we assume the trigger list of other events
-are the same with 1st and fill the trigger decision. However, it is not always this
-case. Then there will be mismatch.
+with the trigger list of the 1st event. Then we assume the trigger list of other events
+are the same with the one of the 1st event and fill the trigger decision. However, 
+it is not always this case. Then there will be mismatch.
 
 For detailed information of mismatch, you can have a look at "out_hlt_5316_first", which
 I got with the official code. In the file, you can see, from 129th event, 
