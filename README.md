@@ -23,7 +23,8 @@ list in the event. Then in each event, I looped over all triggers in our trigger
 index, find the trigger decision, prescaler and trigger objects. The trigger list I used is in file
 hltanalysis_cff.py  You can just add the triggers you are interested
 
-fix the mismatch if the evet trigger lists in one file are not the same
+In src and interface directory, there are two versions of HLTInfo.h and HLTInfo.cc with the fix for
+with trigger objects and without trigger objects. Please pay attention to the comments of the files.
 
 The code are developed in CMSSW_5_3_16 with the official HLTrigger/HLTAnalyzer package
 
